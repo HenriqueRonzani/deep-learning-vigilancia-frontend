@@ -1,5 +1,3 @@
-// Reserved for Laravel. The demo does not call these endpoints.
-// Payloads and response envelopes still need confirmation from the backend team.
 const base = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '')
 async function request(path: string, options: RequestInit = {}): Promise<unknown> {
   const response = await fetch(`${base}${path}`, {

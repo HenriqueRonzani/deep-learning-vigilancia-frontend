@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const router = createRouter({
-  // Hash routes work with S3/CloudFront without fallback rewrite rules.
+
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
