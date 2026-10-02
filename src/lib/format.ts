@@ -1,5 +1,11 @@
-import type { Irregularity, ReportStatus } from '@/types/inspection'
-export const statusLabels: Record<ReportStatus, string> = {
+import type { Irregularity, InspectionStatus, DemandType } from '@/types/inspection'
+export const demandLabels: Record<DemandType, string> = {
+  active: 'Busca ativa',
+  dengue_breeding_site: 'Investigação de foco',
+  report: 'Denúncia',
+}
+export const statusLabels: Record<InspectionStatus, string> = {
+  draft: 'Rascunho',
   queued: 'Na fila',
   processing: 'Em análise',
   completed: 'Finalizada',
@@ -16,8 +22,12 @@ export const formatDate = (date: string) =>
     hour: '2-digit',
     minute: '2-digit',
   }).format(new Date(date))
-export const formatSize = (bytes: number) =>
-  bytes < 1024 * 1024 ? `${Math.ceil(bytes / 1024)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`
+export const formatSize = (bytes: number | null) =>
+  bytes === null
+    ? 'Tamanho não informado'
+    : bytes < 1024 * 1024
+      ? `${Math.ceil(bytes / 1024)} KB`
+      : `${(bytes / 1024 / 1024).toFixed(1)} MB`
 export const MAX_FILES = 20
 export const MAX_FILE_SIZE = 50 * 1024 * 1024
 export function validateFile(file: Pick<File, 'name' | 'type' | 'size'>): string | null {

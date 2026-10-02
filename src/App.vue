@@ -9,11 +9,16 @@ function focusMain() {
   document.getElementById('main')?.focus()
 }
 let timer: ReturnType<typeof setInterval>
+let pollTimer: ReturnType<typeof setInterval>
 onMounted(() => {
   timer = setInterval(() => store.tick(Date.now()), 1000)
+  pollTimer = setInterval(() => {
+    void store.poll()
+  }, 5000)
 })
 onUnmounted(() => {
   clearInterval(timer)
+  clearInterval(pollTimer)
   store.dispose()
 })
 watch(
@@ -61,9 +66,14 @@ watch(
         <span class="breadcrumb">Fiscalização</span><span class="slash">/</span
         ><span>{{ route.meta.title }}</span>
       </div>
-      <span class="demo-tag"><span></span>Ambiente de demonstração</span>
+      <span class="demo-tag"
+        ><span></span>{{ store.isDemo ? 'Ambiente de demonstração' : 'Modo API' }}</span
+      >
     </header>
-    <main id="main" tabindex="-1"><RouterView /></main>
+    <main id="main" tabindex="-1">
+      <p v-if="store.pollingError" role="alert" class="error-box">{{ store.pollingError }}</p>
+      <RouterView />
+    </main>
     <footer>Projeto Integrador · Deep Learning<span>Vigilância Sanitária de Criciúma</span></footer>
   </div>
 </template>
