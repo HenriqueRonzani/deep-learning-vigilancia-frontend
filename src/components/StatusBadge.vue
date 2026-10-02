@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { statusLabels } from '@/lib/format'
-import type { ReportStatus } from '@/types/inspection'
-defineProps<{ status: ReportStatus }>()
+import type { InspectionStatus } from '@/types/inspection'
+defineProps<{ status: InspectionStatus }>()
 </script>
 <template>
   <span class="status-badge" :class="status"
