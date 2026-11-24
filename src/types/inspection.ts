@@ -9,6 +9,7 @@ export interface FileReport {
   irregularity: Irregularity | null
   status: ReportStatus
   agent_report: string
+  processed_url?: string | null
   user_feedback: Feedback | null
 }
 export interface InspectionFile {

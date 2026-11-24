@@ -3,6 +3,7 @@ import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import Icon from '@/components/AppIcon.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
+import ProcessedMedia from '@/components/ProcessedMedia.vue'
 import { useInspectionsStore } from '@/stores/inspections'
 import { categoryLabels, demandLabels, formatDate, formatSize } from '@/lib/format'
 import type { Feedback } from '@/types/inspection'
@@ -231,6 +232,7 @@ async function saveFeedback(reportId: number, value: Feedback) {
             }}</span>
             <p class="muted">Relatório #{{ report.id }}</p>
             <p class="report-text">{{ report.agent_report }}</p>
+            <ProcessedMedia :url="report.processed_url" :mime-type="selected.mime_type" :report-id="report.id" />
             <div class="feedback-area">
               <div>
                 <h3>A sinalização está correta?</h3>

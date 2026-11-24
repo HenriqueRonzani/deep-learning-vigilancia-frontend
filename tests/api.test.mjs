@@ -86,6 +86,7 @@ test('normaliza múltiplos relatórios sem inventar URL de leitura ou tamanho', 
               irregularity: 'open_water_tank',
               status: 'created',
               agent_report: 'A',
+              processed_url: 'https://storage.example/processed.png?signature=test',
               user_feedback: null,
             },
             {
@@ -107,6 +108,11 @@ test('normaliza múltiplos relatórios sem inventar URL de leitura ou tamanho', 
   assert.equal(item.files[0].url, null)
   assert.equal(item.files[0].size, null)
   assert.equal(item.files[0].file_reports.length, 2)
+  assert.equal(
+    item.files[0].file_reports[0].processed_url,
+    'https://storage.example/processed.png?signature=test',
+  )
+  assert.equal(item.files[0].file_reports[1].processed_url, undefined)
   assert.equal(normalizeInspection(dto(2)).filesLoaded, false)
 })
 
