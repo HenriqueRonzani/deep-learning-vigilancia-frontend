@@ -6,20 +6,21 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import ProcessedMedia from '@/components/ProcessedMedia.vue'
 import { useInspectionsStore } from '@/stores/inspections'
 import { categoryLabels, demandLabels, formatDate, formatSize } from '@/lib/format'
+import { reviewFiles } from '@/lib/review-files'
 import type { Feedback } from '@/types/inspection'
 const store = useInspectionsStore()
 const route = useRoute()
 const inspection = computed(() => store.inspections.find((i) => i.id === Number(route.params.id)))
+const visibleFiles = computed(() => (inspection.value ? reviewFiles(inspection.value) : []))
 const activeFile = ref('')
 watch(
-  inspection,
-  (item) => {
-    if (!item?.files.some((f) => f.id === activeFile.value))
-      activeFile.value = item?.files[0]?.id || ''
+  visibleFiles,
+  (files) => {
+    if (!files.some((f) => f.id === activeFile.value)) activeFile.value = files[0]?.id || ''
   },
   { immediate: true },
 )
-const selected = computed(() => inspection.value?.files.find((f) => f.id === activeFile.value))
+const selected = computed(() => visibleFiles.value.find((f) => f.id === activeFile.value))
 const feedbackMessage = ref('')
 const feedbackError = ref('')
 const savingReport = ref<number | null>(null)
@@ -153,15 +154,19 @@ async function saveFeedback(reportId: number, value: Feedback) {
       <aside class="panel file-panel">
         <div class="panel-title">
           <h2>
-            Arquivos <span class="count-badge">{{ inspection.files.length }}</span>
+            {{ inspection.status === 'completed' ? 'Arquivos sinalizados' : 'Arquivos' }}
+            <span class="count-badge">{{ visibleFiles.length }}</span>
           </h2>
         </div>
         <div class="file-list">
           <p v-if="!inspection.files.length" class="muted empty-files">
             Nenhum arquivo registrado nesta solicitação.
           </p>
+          <p v-else-if="!visibleFiles.length" class="muted empty-files">
+            Nenhum arquivo com possível irregularidade sinalizada.
+          </p>
           <button
-            v-for="file in inspection.files"
+            v-for="file in visibleFiles"
             :key="file.id"
             class="file-option"
             :class="{ selected: file.id === activeFile }"
@@ -181,7 +186,16 @@ async function saveFeedback(reportId: number, value: Feedback) {
           </button>
         </div>
       </aside>
-      <div v-if="selected" class="file-detail">
+      <section
+        v-if="inspection.status === 'completed' && inspection.files.length && !visibleFiles.length"
+        class="panel empty-state"
+        role="status"
+      >
+        <Icon name="checkCircle" :size="40" />
+        <h2>Nenhuma possível irregularidade sinalizada</h2>
+        <p>A análise foi concluída. Não há imagens sinalizadas para revisão nesta solicitação.</p>
+      </section>
+      <div v-else-if="selected" class="file-detail">
         <section class="panel preview-panel">
           <div class="panel-title">
             <h2 class="filename-title">{{ selected.name }}</h2>
@@ -232,7 +246,11 @@ async function saveFeedback(reportId: number, value: Feedback) {
             }}</span>
             <p class="muted">Relatório #{{ report.id }}</p>
             <p class="report-text">{{ report.agent_report }}</p>
-            <ProcessedMedia :url="report.processed_url" :mime-type="selected.mime_type" :report-id="report.id" />
+            <ProcessedMedia
+              :url="report.processed_url"
+              :mime-type="selected.mime_type"
+              :report-id="report.id"
+            />
             <div class="feedback-area">
               <div>
                 <h3>A sinalização está correta?</h3>
